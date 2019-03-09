@@ -1,0 +1,12 @@
+E:\Учеба\ТРРП\4\серверы и клиенты\Client_string\Client_string\bin\Debug\Client_string.exe.config
+E:\Учеба\ТРРП\4\серверы и клиенты\Client_string\Client_string\bin\Debug\Client_string.exe
+E:\Учеба\ТРРП\4\серверы и клиенты\Client_string\Client_string\bin\Debug\Client_string.pdb
+E:\Учеба\ТРРП\4\серверы и клиенты\Client_string\Client_string\obj\Debug\Client_string.exe
+E:\Учеба\ТРРП\4\серверы и клиенты\Client_string\Client_string\obj\Debug\Client_string.pdb
+E:\Учеба\ТРРП\4\серверы и клиенты\Client_string\Client_string\obj\Debug\Client_string.csprojResolveAssemblyReference.cache
+E:\Учеба\ТРРП\4\ready\Clients and servers\Client_string\Client_string\bin\Debug\Client_string.exe.config
+E:\Учеба\ТРРП\4\ready\Clients and servers\Client_string\Client_string\obj\Debug\Client_string.exe
+E:\Учеба\ТРРП\4\ready\Clients and servers\Client_string\Client_string\obj\Debug\Client_string.pdb
+E:\Учеба\ТРРП\4\ready\Clients and servers\Client_string\Client_string\bin\Debug\Client_string.exe
+E:\Учеба\ТРРП\4\ready\Clients and servers\Client_string\Client_string\bin\Debug\Client_string.pdb
+E:\Учеба\ТРРП\4\ready\Clients and servers\Client_string\Client_string\obj\Debug\Client_string.csprojResolveAssemblyReference.cache
