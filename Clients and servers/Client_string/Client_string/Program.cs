@@ -3,6 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Net;
 using System.IO;
+using System.Collections;
 
 namespace ConsoleClient
 {
@@ -19,49 +20,64 @@ namespace ConsoleClient
         static string ip_server;
 
         static string fileName = "servers.txt";
+        static ArrayList servers = new ArrayList();
+
+        static bool total = false;
         static void socketForServer()
         {
-            Console.Write("Введите свое имя:");
-            string userName = Console.ReadLine();
-            TcpClient client = null;
+            // TcpClient client = null;
             try
             {
-                client = new TcpClient(ip_server, port_server);
-                NetworkStream stream = client.GetStream();
-
-                while (true)
+                using (var client = new TcpClient(ip_server, port_server))
                 {
-                    Console.Write(userName + ": ");
-                    // ввод сообщения
-                    string message = Console.ReadLine();
-                    message = String.Format("{0}: {1}", userName, message);
-                    // преобразуем сообщение в массив байтов
-                    byte[] data = Encoding.Unicode.GetBytes(message);
-                    // отправка сообщения
-                    stream.Write(data, 0, data.Length);
+                    Console.Write("Введите свое имя:");
+                    string userName = Console.ReadLine();
+                    NetworkStream stream = client.GetStream();
 
-                    // получаем ответ
-                    data = new byte[64]; // буфер для получаемых данных
-                    StringBuilder builder = new StringBuilder();
-                    int bytes = 0;
-                    do
+                    while (true)
                     {
-                        bytes = stream.Read(data, 0, data.Length);
-                        builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-                    }
-                    while (stream.DataAvailable);
+                        Console.Write(userName + ": ");
+                        // ввод сообщения
+                        string message = Console.ReadLine();
+                        message = String.Format("{0}: {1}", userName, message);
+                        // преобразуем сообщение в массив байтов
+                        byte[] data = Encoding.Unicode.GetBytes(message);
+                        // отправка сообщения
+                        stream.Write(data, 0, data.Length);
 
-                    message = builder.ToString();
-                    Console.WriteLine("Сервер: {0}", message);
+                        // получаем ответ
+                        data = new byte[64]; // буфер для получаемых данных
+                        StringBuilder builder = new StringBuilder();
+                        int bytes = 0;
+                        do
+                        {
+                            bytes = stream.Read(data, 0, data.Length);
+                            builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
+                        }
+                        while (stream.DataAvailable);
+
+                        message = builder.ToString();
+                        Console.WriteLine("Сервер: {0}", message);
+                        total = true;
+                    }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                client.Close();
+                total = false;
+                string server;
+                for(int i=0; i<servers.Count; i++)
+                {
+                    server = (string)servers[i];
+                    if (server.Contains(ip_server+":"+port_server))
+                    {
+                        servers[i]+="<unavailable>";
+                        //total = true;
+                        break;
+                    }
+                }
+                //Console.WriteLine(ex.Message);
+                get_ip_port_list();
             }
         }
         static void connect_disp()
@@ -79,7 +95,7 @@ namespace ConsoleClient
                 // Соединяем сокет с удаленной точкой
                 sender.Connect(ipEndPoint);
 
-                Console.WriteLine("Сокет соединяется с {0} ", sender.RemoteEndPoint.ToString());
+                //Console.WriteLine("Сокет соединяется с {0} ", sender.RemoteEndPoint.ToString());
                 byte[] msg = Encoding.UTF8.GetBytes("<Client>");
 
                 // Отправляем данные через сокет
@@ -91,50 +107,89 @@ namespace ConsoleClient
                 {
                     fs.Write(fileData, 0, bytesRec);
                 }
-                get_ip_port();
+                if(get_ip_port_file())
+                {
+                    get_ip_port_list();
+                }
                 // Освобождаем сокет
                 sender.Shutdown(SocketShutdown.Both);
                 sender.Close();
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
-                get_ip_port();
+                //Console.WriteLine(ex.ToString());
+                Console.WriteLine("Невозможно установить соединение с сервером");
+                Console.Read();
             }
-            //finally
-            //{
-            //    Console.ReadLine();
-            //}
         }
-        static bool get_ip_port()
+        static bool get_ip_port_file()
         {
+            string ip;
+            servers.Clear();
+            int port;
             bool flag = false;
             if (File.Exists(fileName))
             {
                 using (StreamReader sr = File.OpenText(fileName))
                 {
-                    string s = "";
+                    string s = "";                    
                     while ((s = sr.ReadLine()) != null)
                     {
-                        if(s.Contains(function))
+                        if (s.Contains(function))
                         {
-                            ip_server = s.Split(':')[0];
-                            port_server = Int32.Parse(s.Split(':')[1]);
+                            servers.Add(s);
                             flag = true;
-                        }
-                        //Console.WriteLine(ip_server + " " + port_server.ToString());
+                        }                      
                     }
                 }
             }
             return flag;
         }
+        static void get_ip_port_list()
+        {
+            foreach(string server in servers)
+            {
+                if (!server.Contains("<unavailable>"))
+                {
+                    ip_server = server.Split(':')[0];
+                    port_server = Int32.Parse(server.Split(':')[1]);
+                    total = true;
+                    return;
+                }
+            }
+            total = false;
+        }
         static void Main(string[] args)
         {
-            if (!get_ip_port())
+            // читаем адреса нужных серверов из файла
+            if (!get_ip_port_file())
             {
+                // если по каким-то причинам не удалось прочитать адреса из файла, обращаемся к диспетчеру
                 connect_disp();
             }
-            socketForServer();
+            else
+            {
+                // получаем ip и порт сервера
+                get_ip_port_list();
+            }
+            while (total)
+            {
+                // если получили адрес сервера, пробуем соединиться с ним
+                socketForServer();
+            }
+            //если соединение упало, проверяем вдруг у диспетчера появилось что-то новенькое
+            connect_disp();
+            while (total)
+            {
+                // снова коннектимся с сервером
+                socketForServer();
+            }
+            if (!total)
+            {
+                // сервера не отвечают
+                Console.WriteLine("Невозможно установить соединение с сервером");
+                Console.Read();
+            }
         }
     }
 }

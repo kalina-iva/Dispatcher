@@ -7,3 +7,6 @@ E:\Учеба\ТРРП\4\Dispatcher\Dispatcher\obj\Debug\Dispatcher.pdb
 E:\Учеба\ТРРП\4\ready\Dispatcher\Dispatcher\bin\Debug\Dispatcher.exe.config
 E:\Учеба\ТРРП\4\ready\Dispatcher\Dispatcher\obj\Debug\Dispatcher.exe
 E:\Учеба\ТРРП\4\ready\Dispatcher\Dispatcher\obj\Debug\Dispatcher.pdb
+E:\Учеба\ТРРП\4\ready\Dispatcher\Dispatcher\bin\Debug\Dispatcher.exe
+E:\Учеба\ТРРП\4\ready\Dispatcher\Dispatcher\bin\Debug\Dispatcher.pdb
+E:\Учеба\ТРРП\4\ready\Dispatcher\Dispatcher\obj\Debug\Dispatcher.csprojResolveAssemblyReference.cache
