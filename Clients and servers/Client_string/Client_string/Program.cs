@@ -11,11 +11,10 @@ namespace ConsoleClient
     {
         static string function = "string";
 
-        static string name_disp = "localhost";
+        static string name_disp = "dispatcher.ru";
+        //static string ip_disp = "192.168.1.34";
         const int port_disp = 9292;
 
-        //const int port_server = 8888;
-        //const string ip_server = "127.0.0.1";
         static int port_server;
         static string ip_server;
 
@@ -24,22 +23,22 @@ namespace ConsoleClient
 
         static bool total = false;
         static void socketForServer()
-        {
-            // TcpClient client = null;
+        {            
             try
             {
+                Console.WriteLine("Соединяемся с сервером");
                 using (var client = new TcpClient(ip_server, port_server))
                 {
-                    Console.Write("Введите свое имя:");
-                    string userName = Console.ReadLine();
+                    //Console.Write("Введите свое имя:");
+                    //string userName = Console.ReadLine();
                     NetworkStream stream = client.GetStream();
 
                     while (true)
                     {
-                        Console.Write(userName + ": ");
+                        Console.Write("Клиент: ");
                         // ввод сообщения
                         string message = Console.ReadLine();
-                        message = String.Format("{0}: {1}", userName, message);
+                        message = String.Format("Клиент: {0}", message);
                         // преобразуем сообщение в массив байтов
                         byte[] data = Encoding.Unicode.GetBytes(message);
                         // отправка сообщения
@@ -64,6 +63,7 @@ namespace ConsoleClient
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Ошибка соединения с сервером");
                 total = false;
                 string server;
                 for(int i=0; i<servers.Count; i++)
@@ -84,12 +84,15 @@ namespace ConsoleClient
         {
             try
             {
+                Console.WriteLine("Соединяемся с диспетчером");
                 // Соединяемся с удаленным устройством
                 // Устанавливаем удаленную точку для сокета
                 IPHostEntry ipHost = Dns.GetHostEntry(name_disp);
                 IPAddress ipAddr = ipHost.AddressList[0];
                 IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, port_disp);
+                //IPEndPoint ipEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.34"), port_disp);
 
+                //Socket sender = new Socket(IPAddress.Parse("192.168.1.34").AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 Socket sender = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
                 // Соединяем сокет с удаленной точкой
@@ -103,10 +106,12 @@ namespace ConsoleClient
                 byte[] fileData = new byte[1024];
                 // Получаем ответ от сервера
                 int bytesRec = sender.Receive(fileData);
+                // преобразуем поток байтов в текстовый файл
                 using (FileStream fs = File.Create(fileName))
                 {
                     fs.Write(fileData, 0, bytesRec);
                 }
+                // получим адрес сервера
                 if(get_ip_port_file())
                 {
                     get_ip_port_list();
@@ -117,6 +122,7 @@ namespace ConsoleClient
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Ошибка соединения с диспетчером");
                 //Console.WriteLine(ex.ToString());
                 Console.WriteLine("Невозможно установить соединение с сервером");
                 Console.Read();
@@ -124,9 +130,7 @@ namespace ConsoleClient
         }
         static bool get_ip_port_file()
         {
-            string ip;
             servers.Clear();
-            int port;
             bool flag = false;
             if (File.Exists(fileName))
             {
@@ -147,8 +151,10 @@ namespace ConsoleClient
         }
         static void get_ip_port_list()
         {
+            // смотрим в списке адресов
             foreach(string server in servers)
             {
+                // если адрес не использовался при подключении к серверу
                 if (!server.Contains("<unavailable>"))
                 {
                     ip_server = server.Split(':')[0];

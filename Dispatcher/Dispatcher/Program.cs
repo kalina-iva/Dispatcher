@@ -29,10 +29,11 @@ namespace Dispatcher
             IPHostEntry ipHost = Dns.GetHostEntry("localhost");
             IPAddress ipAddr = ipHost.AddressList[0];
             const int port_disp = 9292;
-            IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, port_disp);
+            //IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, port_disp);
+            IPEndPoint ipEndPoint = new IPEndPoint(Dns.GetHostEntry(Dns.GetHostName()).AddressList[0], port_disp);
 
             // Создаем сокет Tcp/Ip
-            Socket sListener = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            Socket sListener = new Socket(Dns.GetHostEntry(Dns.GetHostName()).AddressList[0].AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
             // Назначаем сокет локальной конечной точке и слушаем входящие сокеты
             try
@@ -59,7 +60,7 @@ namespace Dispatcher
                             servers.Add(new Server(data.Split(':')[0], data.Split(':')[1], data.Split(':')[2]));
                             serversToFile(data.Split(':')[0], data.Split(':')[1], data.Split(':')[2]);
                         }// Отправляем ответ клиенту
-                        string reply = "Спасибо за запрос в " + data.Length.ToString() + " символов";
+                        string reply = "Ваш адрес успешно принят и обработан";
                         byte[] msg = Encoding.UTF8.GetBytes(reply);
                         handler.Send(msg);
                     }

@@ -5,15 +5,15 @@ using System.Threading;
 using System.Text;
 
 namespace Server_string
-{ 
+{
     class Program
     {
-        static string name_disp = "localhost";
+        static string name_disp = "dispatcher.ru";
         private const int port_disp = 9292;
         //static string ip_disp = "127.0.0.1";
-
-        static string ip_server = "127.0.0.1";
-        const int port_server = 9111;
+        
+        static string ip_server =  Dns.GetHostEntry(Dns.GetHostName()).AddressList[0].ToString();
+        const int port_server = 9595;
         static string function = "string";
 
         static TcpListener listener;
@@ -28,8 +28,10 @@ namespace Server_string
                 // Устанавливаем удаленную точку для сокета
                 IPHostEntry ipHost = Dns.GetHostEntry(name_disp);
                 IPAddress ipAddr = ipHost.AddressList[0];
+                //IPEndPoint ipEndPoint = new IPEndPoint(IPAddress.Parse("192.168.1.34"), port_disp);
                 IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, port_disp);
 
+                //Socket sender = new Socket(IPAddress.Parse("192.168.1.34").AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 Socket sender = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
                 // Соединяем сокет с удаленной точкой
@@ -47,11 +49,7 @@ namespace Server_string
                 // Получаем ответ от сервера
                 int bytesRec = sender.Receive(bytes);
 
-                Console.WriteLine("\nОтвет от сервера: {0}\n\n", Encoding.UTF8.GetString(bytes, 0, bytesRec));
-
-                // Используем рекурсию для неоднократного вызова SendMessageFromSocket()
-                //if (message.IndexOf("<TheEnd>") == -1)
-                //    SendMessageFromSocket(port);
+                Console.WriteLine("Ответ от диспетчера: {0}\n", Encoding.UTF8.GetString(bytes, 0, bytesRec));
 
                 // Освобождаем сокет
                 sender.Shutdown(SocketShutdown.Both);
@@ -59,12 +57,9 @@ namespace Server_string
             }
             catch (Exception ex)
             {
+                Console.WriteLine("Не удалось соединиться с диспетчером");
                 //Console.WriteLine(ex.ToString());
             }
-            //finally
-            //{
-            //    Console.ReadLine();
-            //}
         }
         static void connect_client()
         {
@@ -72,32 +67,32 @@ namespace Server_string
             {
                 listener = new TcpListener(IPAddress.Parse(ip_server), port_server);
                 listener.Start();
-                Console.WriteLine("Ожидание подключений...");
- 
-                while(true)
+                Console.WriteLine("Ожидание подключений через порт {0}:{1}", ip_server, port_server);
+
+                while (true)
                 {
                     TcpClient client = listener.AcceptTcpClient();
                     ClientObject clientObject = new ClientObject(client);
- 
+
                     // создаем новый поток для обслуживания нового клиента
                     Thread clientThread = new Thread(new ThreadStart(clientObject.Process));
                     clientThread.Start();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
             finally
             {
-                if(listener!=null)
+                if (listener != null)
                     listener.Stop();
             }
         }
         static void Main(string[] args)
         {
-            connect_disp();
+            connect_disp();            
             connect_client();
-        }        
+        }
     }
 }

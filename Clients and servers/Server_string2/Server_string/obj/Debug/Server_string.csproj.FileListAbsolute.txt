@@ -13,6 +13,3 @@ E:\Учеба\ТРРП\4\ready\Clients and servers\Server_string\Server_string\o
 E:\Учеба\ТРРП\4\ready\Clients and servers\Server_string2\Server_string\bin\Debug\Server_string.exe.config
 E:\Учеба\ТРРП\4\ready\Clients and servers\Server_string2\Server_string\obj\Debug\Server_string.exe
 E:\Учеба\ТРРП\4\ready\Clients and servers\Server_string2\Server_string\obj\Debug\Server_string.pdb
-E:\Учеба\ТРРП\4\ready\Clients and servers\Server_string2\Server_string\bin\Debug\Server_string.exe
-E:\Учеба\ТРРП\4\ready\Clients and servers\Server_string2\Server_string\bin\Debug\Server_string.pdb
-E:\Учеба\ТРРП\4\ready\Clients and servers\Server_string2\Server_string\obj\Debug\Server_string.csprojResolveAssemblyReference.cache
